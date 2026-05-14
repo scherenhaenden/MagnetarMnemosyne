@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        body { background-color: #0f1115; color: #e2e8f0; font-family: sans-serif; }
+        .animate-fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body id="body-content">
+    {% if state.appStage == 'intro' %}
+    <!-- PANTALLA 1: INTRO -->
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="max-w-2xl w-full bg-[#1c1f26] rounded-2xl p-8 border border-slate-800 shadow-2xl">
+            <div class="mb-10 text-center">
+                <h1 class="text-3xl font-bold text-white mb-4">Examen de Prueba</h1>
+                <p class="text-slate-400">Personaliza tu experiencia antes de comenzar.</p>
+            </div>
+
+            <form hx-post="/start" hx-target="#body-content" hx-swap="innerHTML">
+                <div class="space-y-4 mb-10">
+                    <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                        Configuración de Feedback
+                    </h3>
+                    
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="feedbackMode" value="immediate" checked class="hidden peer">
+                            <div class="p-5 rounded-xl border-2 transition-all duration-200 border-slate-800 bg-[#13151a] peer-checked:border-[#8eb0ff] peer-checked:bg-[#8eb0ff]/10 h-full">
+                                <span class="font-semibold text-white block mb-2">Modo Interactivo</span>
+                                <p class="text-sm text-slate-400">Responde y mira si acertaste al instante. Incluye explicación.</p>
+                            </div>
+                        </label>
+
+                        <label class="cursor-pointer">
+                            <input type="radio" name="feedbackMode" value="delayed" class="hidden peer">
+                            <div class="p-5 rounded-xl border-2 transition-all duration-200 border-slate-800 bg-[#13151a] peer-checked:border-[#8eb0ff] peer-checked:bg-[#8eb0ff]/10 h-full">
+                                <span class="font-semibold text-white block mb-2">Modo Clásico</span>
+                                <p class="text-sm text-slate-400">Responde sin interrupciones. Nota al final.</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-[#a5c0ff] hover:bg-[#8eb0ff] text-[#0f1115] font-bold py-4 px-8 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 text-lg">
+                    Comenzar Examen
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {% elif state.appStage == 'exam' %}
+    <!-- PANTALLA 2: EXAMEN -->
+    {% set q = questions[state.currentQuestionIndex] %}
+    {% set isAnswered = state.currentQuestionIndex|string in state.userAnswers or state.currentQuestionIndex in state.userAnswers %}
+    {% set userAnswerIndex = state.userAnswers[state.currentQuestionIndex|string] if state.currentQuestionIndex|string in state.userAnswers else state.userAnswers[state.currentQuestionIndex] %}
+
+    <div class="min-h-screen flex flex-col">
+        <header class="w-full max-w-4xl mx-auto p-6 flex items-center justify-between gap-6">
+            <div class="flex gap-1.5 flex-1 h-1.5">
+                {% for i in range(questions|length) %}
+                <div class="h-full flex-1 rounded-full transition-all duration-300 {% if i < state.currentQuestionIndex %}bg-[#a5c0ff]{% elif i == state.currentQuestionIndex %}bg-white{% else %}bg-slate-800{% endif %}"></div>
+                {% endfor %}
+            </div>
+
+            <div class="flex items-center gap-4 text-sm font-medium shrink-0">
+                <span class="text-slate-300">{{ state.currentQuestionIndex + 1 }}/{{ questions|length }}</span>
+                {% if state.feedbackMode == 'immediate' %}
+                <div class="flex items-center gap-1.5 bg-[#3a1a1a] text-[#ff6b6b] px-3 py-1.5 rounded-full">
+                    <span>{{ stats.incorrect }}</span>
+                </div>
+                <div class="flex items-center gap-1.5 bg-[#1a3a26] text-[#4cd137] px-3 py-1.5 rounded-full">
+                    <span>{{ stats.correct }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </header>
+
+        <main class="flex-1 w-full max-w-4xl mx-auto p-6 flex flex-col justify-center pb-24">
+            <div class="flex gap-4 mb-8">
+                <span class="text-xl font-medium text-slate-400 mt-1">{{ state.currentQuestionIndex + 1 }}.</span>
+                <h2 class="text-2xl font-medium text-slate-100 leading-relaxed whitespace-pre-wrap">{{ q.question }}</h2>
+            </div>
+
+            <div class="space-y-4 ml-8">
+                {% for option in q.options %}
+                {% set index = loop.index0 %}
+                {% set isSelected = userAnswerIndex == index %}
+                {% set isCorrectOption = q.correctAnswerIndex == index %}
+
+                {% set containerClasses = "border-transparent bg-[#1c1f26] text-slate-300 hover:bg-[#252a36] cursor-pointer" %}
+                {% set letterClasses = "text-slate-500" %}
+                {% set showFeedbackBlock = false %}
+
+                {% if state.feedbackMode == 'immediate' and isAnswered %}
+                    {% set containerClasses = "border-transparent bg-[#1c1f26] text-slate-500 cursor-default opacity-60" %}
+                    {% if isSelected and isCorrectOption %}
+                        {% set containerClasses = "border-[#4cd137] bg-[#1a3a26]/30 text-white cursor-default border-2" %}
+                        {% set letterClasses = "text-[#4cd137]" %}
+                        {% set showFeedbackBlock = true %}
+                        {% set isFeedbackCorrect = true %}
+                    {% elif isSelected and not isCorrectOption %}
+                        {% set containerClasses = "border-[#ff6b6b] bg-[#3a1a1a]/30 text-white cursor-default border-2" %}
+                        {% set letterClasses = "text-[#ff6b6b]" %}
+                        {% set showFeedbackBlock = true %}
+                        {% set isFeedbackCorrect = false %}
+                    {% elif not isSelected and isCorrectOption %}
+                        {% set containerClasses = "border-[#4cd137]/50 bg-[#1a3a26]/10 text-slate-300 cursor-default border-2 opacity-100" %}
+                        {% set letterClasses = "text-[#4cd137]/80" %}
+                    {% endif %}
+                {% elif state.feedbackMode == 'delayed' and isSelected %}
+                    {% set containerClasses = "border-[#8eb0ff] bg-[#8eb0ff]/10 text-white border-2 cursor-pointer" %}
+                    {% set letterClasses = "text-[#8eb0ff]" %}
+                {% endif %}
+
+                <div hx-post="/select" hx-vals='{"optionIndex": {{ index }}}' hx-target="#body-content" hx-swap="innerHTML"
+                     class="rounded-2xl p-5 border-2 transition-all duration-200 {{ containerClasses }}">
+                    <div class="flex gap-4 items-start">
+                        <span class="text-lg font-medium w-6 shrink-0 {{ letterClasses }}">{{ "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[index] }}.</span>
+                        <div class="flex-1">
+                            <p class="text-lg">{{ option }}</p>
+                            {% if showFeedbackBlock %}
+                            <div class="mt-4 pt-4 border-t border-white/10 animate-fade-in">
+                                <div class="flex items-center gap-2 mb-2 font-medium {% if isFeedbackCorrect %}text-[#4cd137]{% else %}text-[#ff6b6b]{% endif %}">
+                                    <span>{% if isFeedbackCorrect %}¡Correcto!{% else %}Incorrecto{% endif %}</span>
+                                </div>
+                                <p class="text-slate-300 leading-relaxed">{{ q.explanation }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+
+        {% if isAnswered %}
+        <div class="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#0f1115] via-[#0f1115] to-transparent">
+            <div class="max-w-4xl mx-auto flex justify-end">
+                <button hx-post="/next" hx-target="#body-content" hx-swap="innerHTML"
+                        class="bg-[#a5c0ff] hover:bg-[#8eb0ff] text-[#0f1115] font-semibold py-3 px-8 rounded-full transition-all duration-200 shadow-[0_0_20px_rgba(165,192,255,0.2)]">
+                    <span class="text-lg">{% if state.currentQuestionIndex == questions|length - 1 %}Finalizar{% else %}Siguiente{% endif %}</span>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% elif state.appStage == 'results' %}
+    <!-- PANTALLA 3: RESULTADOS -->
+    {% set percentage = ((stats.correct / questions|length) * 100)|round|int %}
+    <div class="min-h-screen py-12 px-4 flex justify-center">
+        <div class="max-w-3xl w-full">
+            <div class="bg-[#1c1f26] rounded-3xl p-10 text-center border border-slate-800 mb-8 shadow-2xl">
+                <h2 class="text-4xl font-bold text-white mb-2">Examen Completado</h2>
+                <p class="text-slate-400 mb-8">Resumen de tu rendimiento</p>
+                
+                <div class="flex justify-center items-center gap-12 mb-10">
+                    <div>
+                        <div class="text-5xl font-black text-[#a5c0ff] mb-2">{{ stats.correct }}<span class="text-2xl text-slate-600">/{{ questions|length }}</span></div>
+                        <div class="text-sm uppercase tracking-widest text-slate-500 font-semibold">Aciertos</div>
+                    </div>
+                    <div class="w-px h-16 bg-slate-800"></div>
+                    <div>
+                        <div class="text-5xl font-black mb-2 {% if percentage >= 60 %}text-[#4cd137]{% else %}text-[#ff6b6b]{% endif %}">{{ percentage }}%</div>
+                        <div class="text-sm uppercase tracking-widest text-slate-500 font-semibold">Puntuación</div>
+                    </div>
+                </div>
+
+                <button hx-post="/restart" hx-target="#body-content" hx-swap="innerHTML"
+                        class="bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 px-8 rounded-full transition-colors flex items-center justify-center mx-auto gap-2">
+                    Volver a intentar
+                </button>
+            </div>
+
+            <div class="space-y-6">
+                <h3 class="text-xl font-bold text-white px-2">Revisión de Respuestas</h3>
+                {% for q in questions %}
+                {% set idx = loop.index0 %}
+                {% set u_ans = state.userAnswers[idx|string] if idx|string in state.userAnswers else state.userAnswers[idx] %}
+                {% set is_corr = u_ans == q.correctAnswerIndex %}
+                <div class="bg-[#1c1f26] rounded-2xl border border-slate-800 p-6">
+                    <div class="flex items-start justify-between mb-4 gap-4">
+                        <h4 class="text-lg font-medium text-slate-200"><span class="text-slate-500 mr-2">{{ idx + 1 }}.</span>{{ q.question }}</h4>
+                        <div class="shrink-0 mt-1">
+                            {% if is_corr %}
+                            <div class="bg-[#1a3a26] text-[#4cd137] px-3 py-1 rounded-full text-sm font-semibold">Correcto</div>
+                            {% else %}
+                            <div class="bg-[#3a1a1a] text-[#ff6b6b] px-3 py-1 rounded-full text-sm font-semibold">Incorrecto</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="bg-[#13151a] p-4 rounded-xl border border-slate-800">
+                        <p class="text-sm text-slate-400 mb-2 uppercase tracking-wider">{% if is_corr %}Tu respuesta correcta:{% else %}Tu respuesta: {{ q.options[u_ans] }} — Correcta:{% endif %}</p>
+                        <p class="text-white text-lg mb-4">{{ q.options[q.correctAnswerIndex] }}</p>
+                        <div class="bg-slate-800/50 p-4 rounded-lg border-l-2 border-[#a5c0ff]">
+                            <p class="text-sm text-slate-300">{{ q.explanation }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</body>
+</html>

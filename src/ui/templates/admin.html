@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Exam System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        .dark body { background-color: #0f1115; color: #e2e8f0; }
+        body { background-color: #f8fafc; color: #1e293b; transition: background-color 0.3s, color 0.3s; }
+    </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8">
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold dark:text-white text-slate-900">Admin Dashboard</h1>
+            <div class="flex gap-4">
+                <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:opacity-80 transition-all">
+                    🌓 Theme
+                </button>
+                <a href="/" class="p-2 px-4 rounded-lg bg-[#a5c0ff] text-[#0f1115] font-bold hover:opacity-90">Ver Examen</a>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Form Column -->
+            <div class="lg:col-span-1">
+                <div class="bg-white dark:bg-[#1c1f26] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl sticky top-8">
+                    <h2 class="text-xl font-bold mb-4 dark:text-white">Nueva Pregunta</h2>
+                    <form action="/admin/add" method="POST" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1 opacity-70">Tipo</label>
+                            <select name="type" id="type-select" onchange="toggleOptions(this.value)" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                                <option value="multiple_choice">Múltiple Choice</option>
+                                <option value="long_text">Respuesta Larga</option>
+                                <option value="audio">Audio</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1 opacity-70">Pregunta</label>
+                            <textarea name="question" required class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700" rows="3"></textarea>
+                        </div>
+                        
+                        <div id="mc-options" class="space-y-2">
+                            <label class="block text-sm font-medium mb-1 opacity-70">Opciones (A-D)</label>
+                            <input type="text" name="option0" placeholder="Opción A" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                            <input type="text" name="option1" placeholder="Opción B" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                            <input type="text" name="option2" placeholder="Opción C" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                            <input type="text" name="option3" placeholder="Opción D" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                            <label class="block text-sm font-medium mb-1 opacity-70">Índice Correcto (0-3)</label>
+                            <input type="number" name="correctIndex" min="0" max="3" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1 opacity-70">Explicación</label>
+                            <textarea name="explanation" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700" rows="2"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-[#a5c0ff] text-[#0f1115] font-bold py-3 rounded-xl hover:opacity-90 transition-all">
+                            Guardar Pregunta
+                        </button>
+                    </form>
+                </div>
+
+                <!-- JSON Import Section -->
+                <div class="mt-8 bg-white dark:bg-[#1c1f26] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl">
+                    <h2 class="text-xl font-bold mb-4 dark:text-white">Importar JSON</h2>
+                    <form action="/admin/import" method="POST" class="space-y-4">
+                        <textarea name="json_data" placeholder='[{"type": "multiple_choice", ...}]' class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-mono text-xs" rows="5"></textarea>
+                        <button type="submit" class="w-full bg-slate-700 text-white font-bold py-2 rounded-xl hover:opacity-90 transition-all text-sm">
+                            Importar Preguntas
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- List Column -->
+            <div class="lg:col-span-2 space-y-4">
+                <h2 class="text-xl font-bold dark:text-white">Preguntas Existentes ({{ questions|length }})</h2>
+                {% for q in questions %}
+                <div class="bg-white dark:bg-[#1c1f26] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md group">
+                    <div class="flex justify-between items-start gap-4">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-xs font-bold uppercase tracking-widest px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 opacity-70">
+                                    {{ q.type }}
+                                </span>
+                                <span class="text-slate-400">#{{ q.id }}</span>
+                            </div>
+                            <p class="text-lg font-medium mb-4 whitespace-pre-wrap">{{ q.question }}</p>
+                            
+                            {% if q.type == 'multiple_choice' %}
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                {% for opt in q.options %}
+                                <div class="p-2 rounded border border-slate-100 dark:border-slate-800 {% if loop.index0 == q.correctAnswerIndex %}bg-green-500/10 border-green-500/50 text-green-600 dark:text-green-400{% endif %}">
+                                    {{ "ABCD"[loop.index0] }}. {{ opt }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <form action="/admin/delete/{{ q.id }}" method="POST">
+                            <button type="submit" class="text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100">
+                                Eliminar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleOptions(type) {
+            const container = document.getElementById('mc-options');
+            if (type === 'multiple_choice') {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

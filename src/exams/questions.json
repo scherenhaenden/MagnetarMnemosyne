@@ -1,0 +1,15 @@
+[
+  {
+    "id": 1,
+    "type": "multiple_choice",
+    "question": "Lee el siguiente cartel:\n«Lunes cerrado por descanso del personal. Martes a domingo: de 13:00 a 16:30 y de 20:00 a 23:30.»\n¿Qué tipo de establecimiento es probablemente?",
+    "options": [
+      "Un restaurante",
+      "Una oficina de correos",
+      "Una farmacia",
+      "Un banco local"
+    ],
+    "correctAnswerIndex": 0,
+    "explanation": "El horario dividido en franjas para el almuerzo y la cena, junto con el día de descanso semanal, es característico de los locales de hostelería."
+  }
+]
