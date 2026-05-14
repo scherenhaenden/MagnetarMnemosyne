@@ -209,6 +209,9 @@ async def add_question_route(
     return RedirectResponse(url="/admin?tab=questions", status_code=303)
 
 def run_ui():
+    print("Starting UI on http://0.0.0.0:8000")
+    print("Admin Dashboard: http://0.0.0.0:8000/admin")
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
 @app.post("/admin/delete/{q_id}", response_class=HTMLResponse)
 async def delete_question_route(request: Request, q_id: int):
