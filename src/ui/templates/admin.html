@@ -6,126 +6,188 @@
     <title>Admin Dashboard - Exam System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-        }
+        tailwind.config = { darkMode: 'class' }
     </script>
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <style>
         .dark body { background-color: #0f1115; color: #e2e8f0; }
         body { background-color: #f8fafc; color: #1e293b; transition: background-color 0.3s, color 0.3s; }
+        .tab-active { border-bottom: 2px solid #a5c0ff; color: #a5c0ff; }
     </style>
 </head>
 <body class="min-h-screen p-4 sm:p-8">
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-6xl mx-auto">
         <!-- Header -->
         <div class="flex justify-between items-center mb-8">
             <h1 class="text-3xl font-bold dark:text-white text-slate-900">Admin Dashboard</h1>
             <div class="flex gap-4">
-                <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:opacity-80 transition-all">
-                    🌓 Theme
-                </button>
+                <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:opacity-80 transition-all">🌓 Theme</button>
                 <a href="/" class="p-2 px-4 rounded-lg bg-[#a5c0ff] text-[#0f1115] font-bold hover:opacity-90">Ver Examen</a>
             </div>
         </div>
 
-        <div class="grid lg:grid-cols-3 gap-8">
+        <!-- Navigation Tabs -->
+        <div class="flex gap-8 border-b border-slate-200 dark:border-slate-800 mb-8">
+            <a href="/admin?tab=questions" class="pb-4 font-semibold {% if active_tab == 'questions' %}tab-active{% else %}opacity-50{% endif %}">Preguntas</a>
+            <a href="/admin?tab=exams" class="pb-4 font-semibold {% if active_tab == 'exams' %}tab-active{% else %}opacity-50{% endif %}">Exámenes</a>
+            <a href="/admin?tab=results" class="pb-4 font-semibold {% if active_tab == 'results' %}tab-active{% else %}opacity-50{% endif %}">Resultados</a>
+        </div>
+
+        {% if active_tab == 'questions' %}
+        <div class="grid lg:grid-cols-3 gap-8 animate-fade-in">
             <!-- Form Column -->
             <div class="lg:col-span-1">
-                <div class="bg-white dark:bg-[#1c1f26] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl sticky top-8">
+                <div class="bg-white dark:bg-[#1c1f26] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl mb-8">
                     <h2 class="text-xl font-bold mb-4 dark:text-white">Nueva Pregunta</h2>
                     <form action="/admin/add" method="POST" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium mb-1 opacity-70">Tipo</label>
-                            <select name="type" id="type-select" onchange="toggleOptions(this.value)" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
-                                <option value="multiple_choice">Múltiple Choice</option>
-                                <option value="long_text">Respuesta Larga</option>
-                                <option value="audio">Audio</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1 opacity-70">Pregunta</label>
-                            <textarea name="question" required class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700" rows="3"></textarea>
-                        </div>
+                        <select name="type" onchange="toggleOptions(this.value)" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                            <option value="multiple_choice">Múltiple Choice</option>
+                            <option value="long_text">Respuesta Larga</option>
+                            <option value="audio_listening">Audio (Escuchar y escribir)</option>
+                        </select>
+                        <textarea name="question" required placeholder="Pregunta" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700" rows="3"></textarea>
                         
+                        <!-- Audio Field -->
+                        <div id="audio-field" style="display:none">
+                            <input type="text" name="audioUrl" placeholder="URL del Audio (ej. /static/audio.mp3)" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                        </div>
                         <div id="mc-options" class="space-y-2">
-                            <label class="block text-sm font-medium mb-1 opacity-70">Opciones (A-D)</label>
-                            <input type="text" name="option0" placeholder="Opción A" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
-                            <input type="text" name="option1" placeholder="Opción B" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
-                            <input type="text" name="option2" placeholder="Opción C" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
-                            <input type="text" name="option3" placeholder="Opción D" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
-                            <label class="block text-sm font-medium mb-1 opacity-70">Índice Correcto (0-3)</label>
-                            <input type="number" name="correctIndex" min="0" max="3" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                            <input type="text" name="option0" placeholder="A" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                            <input type="text" name="option1" placeholder="B" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                            <input type="text" name="option2" placeholder="C" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                            <input type="text" name="option3" placeholder="D" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                            <input type="number" name="correctIndex" placeholder="Índice Correcto (0-3)" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
                         </div>
-
-                        <div>
-                            <label class="block text-sm font-medium mb-1 opacity-70">Explicación</label>
-                            <textarea name="explanation" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700" rows="2"></textarea>
-                        </div>
-
-                        <button type="submit" class="w-full bg-[#a5c0ff] text-[#0f1115] font-bold py-3 rounded-xl hover:opacity-90 transition-all">
-                            Guardar Pregunta
-                        </button>
+                        <textarea name="explanation" placeholder="Explicación" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700" rows="2"></textarea>
+                        <button type="submit" class="w-full bg-[#a5c0ff] text-[#0f1115] font-bold py-3 rounded-xl hover:opacity-90">Guardar</button>
                     </form>
                 </div>
-
-                <!-- JSON Import Section -->
-                <div class="mt-8 bg-white dark:bg-[#1c1f26] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl">
+                <!-- JSON Import -->
+                <div class="bg-white dark:bg-[#1c1f26] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl">
                     <h2 class="text-xl font-bold mb-4 dark:text-white">Importar JSON</h2>
                     <form action="/admin/import" method="POST" class="space-y-4">
                         <textarea name="json_data" placeholder='[{"type": "multiple_choice", ...}]' class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-mono text-xs" rows="5"></textarea>
-                        <button type="submit" class="w-full bg-slate-700 text-white font-bold py-2 rounded-xl hover:opacity-90 transition-all text-sm">
-                            Importar Preguntas
-                        </button>
+                        <button type="submit" class="w-full bg-slate-700 text-white font-bold py-2 rounded-xl text-sm">Importar</button>
                     </form>
                 </div>
             </div>
-
             <!-- List Column -->
             <div class="lg:col-span-2 space-y-4">
-                <h2 class="text-xl font-bold dark:text-white">Preguntas Existentes ({{ questions|length }})</h2>
                 {% for q in questions %}
-                <div class="bg-white dark:bg-[#1c1f26] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md group">
-                    <div class="flex justify-between items-start gap-4">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="text-xs font-bold uppercase tracking-widest px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 opacity-70">
-                                    {{ q.type }}
-                                </span>
-                                <span class="text-slate-400">#{{ q.id }}</span>
-                            </div>
-                            <p class="text-lg font-medium mb-4 whitespace-pre-wrap">{{ q.question }}</p>
-                            
-                            {% if q.type == 'multiple_choice' %}
-                            <div class="grid grid-cols-2 gap-2 text-sm">
-                                {% for opt in q.options %}
-                                <div class="p-2 rounded border border-slate-100 dark:border-slate-800 {% if loop.index0 == q.correctAnswerIndex %}bg-green-500/10 border-green-500/50 text-green-600 dark:text-green-400{% endif %}">
-                                    {{ "ABCD"[loop.index0] }}. {{ opt }}
+                <div class="bg-white dark:bg-[#1c1f26] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md flex justify-between group">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-widest px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 opacity-70">{{ q.type }} #{{ q.id }}</span>
+                        <p class="text-lg font-medium mt-2 whitespace-pre-wrap">{{ q.question }}</p>
+                    </div>
+                    <form action="/admin/delete/{{ q.id }}" method="POST">
+                        <button type="submit" class="text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">Eliminar</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if active_tab == 'exams' %}
+        <div class="grid lg:grid-cols-3 gap-8 animate-fade-in">
+            <!-- Create/Edit Exam -->
+            <div class="lg:col-span-1">
+                <div class="bg-white dark:bg-[#1c1f26] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl">
+                    <h2 class="text-xl font-bold mb-4 dark:text-white">
+                        {% if editing_exam %}Editar Examen: {{ editing_exam.title }}{% else %}Nuevo Examen{% endif %}
+                    </h2>
+                    <form action="{% if editing_exam %}/admin/exams/update/{{ editing_exam.id }}{% else %}/admin/exams/add{% endif %}" method="POST" class="space-y-4">
+                        <input type="text" name="title" required placeholder="Título del Examen" value="{% if editing_exam %}{{ editing_exam.title }}{% endif %}" class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                        <div class="max-h-96 overflow-y-auto space-y-2 p-2 bg-slate-50 dark:bg-slate-950 rounded-lg">
+                            <p class="text-sm opacity-50 mb-2">Selecciona las preguntas:</p>
+                            {% for q in questions %}
+                            <label class="flex items-center gap-3 p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded cursor-pointer border border-transparent {% if q.id in selected_ids %}border-[#a5c0ff]/30 bg-[#a5c0ff]/5{% endif %}">
+                                <input type="checkbox" name="q_ids" value="{{ q.id }}" {% if q.id in selected_ids %}checked{% endif %}>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[10px] uppercase font-bold opacity-40">{{ q.type }}</span>
+                                        <span class="text-sm truncate">{{ q.question }}</span>
+                                    </div>
                                 </div>
-                                {% endfor %}
-                            </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit" class="flex-1 bg-[#a5c0ff] text-[#0f1115] font-bold py-3 rounded-xl hover:opacity-90">
+                                {% if editing_exam %}Actualizar{% else %}Crear Examen{% endif %}
+                            </button>
+                            {% if editing_exam %}
+                            <a href="/admin?tab=exams" class="bg-slate-700 text-white font-bold py-3 px-4 rounded-xl hover:opacity-90">X</a>
                             {% endif %}
                         </div>
-                        <form action="/admin/delete/{{ q.id }}" method="POST">
-                            <button type="submit" class="text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100">
-                                Eliminar
-                            </button>
-                        </form>
+                    </form>
+                </div>
+            </div>
+            <!-- Exams List -->
+            <div class="lg:col-span-2 space-y-4">
+                {% for exam in exams %}
+                <div class="bg-white dark:bg-[#1c1f26] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md group">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-bold">{{ exam.title }}</h3>
+                            <p class="text-slate-500 text-sm mt-1">Creado: {{ exam.created_at }}</p>
+                        </div>
+                        <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <a href="/admin/exams/edit/{{ exam.id }}" class="p-2 rounded-lg bg-[#a5c0ff]/10 text-[#a5c0ff] hover:bg-[#a5c0ff]/20">Editar</a>
+                            <form action="/admin/exams/delete/{{ exam.id }}" method="POST">
+                                <button type="submit" class="p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20">Eliminar</button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Contenido:</p>
+                        <div class="flex flex-wrap gap-2">
+                            {% set q_ids_list = exam.question_ids|from_json %}
+                            {% for qid in q_ids_list %}
+                                <span class="text-[10px] bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Q#{{ qid }}</span>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
+        {% endif %}
+
+        {% if active_tab == 'results' %}
+        <div class="bg-white dark:bg-[#1c1f26] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden animate-fade-in">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-slate-50 dark:bg-slate-900">
+                    <tr>
+                        <th class="p-4 font-bold border-b dark:border-slate-800">Estudiante</th>
+                        <th class="p-4 font-bold border-b dark:border-slate-800">Examen</th>
+                        <th class="p-4 font-bold border-b dark:border-slate-800">Puntuación</th>
+                        <th class="p-4 font-bold border-b dark:border-slate-800">Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for res in results %}
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                        <td class="p-4 border-b dark:border-slate-800">{{ res.student_name }}</td>
+                        <td class="p-4 border-b dark:border-slate-800">{{ res.exam_title }}</td>
+                        <td class="p-4 border-b dark:border-slate-800">
+                            <span class="{% if res.percentage >= 60 %}text-green-500{% else %}text-red-500{% endif %} font-bold">
+                                {{ res.score }}/{{ res.total_questions }} ({{ res.percentage|int }}%)
+                            </span>
+                        </td>
+                        <td class="p-4 border-b dark:border-slate-800 text-sm opacity-50">{{ res.completed_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
     </div>
 
     <script>
         function toggleOptions(type) {
-            const container = document.getElementById('mc-options');
-            if (type === 'multiple_choice') {
-                container.classList.remove('hidden');
-            } else {
-                container.classList.add('hidden');
-            }
+            document.getElementById('mc-options').style.display = type === 'multiple_choice' ? 'block' : 'none';
+            document.getElementById('audio-field').style.display = type === 'audio_listening' ? 'block' : 'none';
         }
     </script>
 </body>
