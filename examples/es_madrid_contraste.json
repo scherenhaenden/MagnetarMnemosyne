@@ -1,0 +1,19 @@
+{
+  "speakers": [
+    {
+      "id": "madrid_galdos",
+      "label": "Galdós Narrator",
+      "descriptor": "voz masculina de Madrid, tono histórico y analítico, castellano peninsular claro",
+      "reference_audio_url": "/Users/edwardflores/Projects/Development/MagnetarMnemosyne/assets/reference-voices-spain/madrid_galdos_19_marzo_2_mayo_ref.wav",
+      "reference_text": "Los sucesos del diecinueve de marzo marcaron un antes y un después en la historia de nuestra Villa y Corte, despertando un sentimiento que nadie esperaba."
+    },
+    {
+      "id": "madrid_bohemio",
+      "label": "Max Estrella (Bohemio)",
+      "descriptor": "voz masculina de Madrid, estilo teatral, bohemio y ligeramente dramático",
+      "reference_audio_url": "/Users/edwardflores/Projects/Development/MagnetarMnemosyne/assets/reference-voices-spain/madrid_luces_bohemia_ref.wav",
+      "reference_text": "¡Mal Polonia! ¡Mala España! ¡Maldita sea mi suerte! En este Madrid absurdo, brillante y hambriento, solo nos queda la tragedia convertida en esperpento."
+    }
+  ],
+  "dialogue": "Galdós Narrator (voz masculina de Madrid, tono histórico y analítico, castellano peninsular claro):\n[reflexivo]\nCamino por las calles de este Madrid moderno y no puedo evitar recordar los ecos de mil ochocientos ocho. Las piedras de la Puerta del Sol aún parecen guardar el calor de aquella lucha por la libertad.\n\nMax Estrella (Bohemio) (voz masculina de Madrid, estilo teatral, bohemio y ligeramente dramático):\n[con amargura]\n¡Libertad, dice usted! Qué palabra tan sonora para una ciudad que se deshace en los callejones oscuros. Mi querido cronista, la libertad en Madrid es un sueño que se tiene con el estómago vacío y los ojos llenos de sombras.\n\nGaldós Narrator (voz masculina de Madrid, tono histórico y analítico, castellano peninsular claro):\n[analítico]\nSin embargo, señor Estrella, es en esa misma oscuridad donde surge la verdadera esencia del pueblo madrileño. La bohemia no es más que otra forma de resistencia, un reflejo de nuestra capacidad para encontrar belleza en el caos.\n\nMax Estrella (Bohemio) (voz masculina de Madrid, estilo teatral, bohemio y ligeramente dramático):\n[teatral]\n¡El esperpento! Eso es lo que somos. Los héroes clásicos reflejados en los espejos cóncavos de la calle del Gato. Madrid es una deformación grotesca de la civilización europea. ¡Bebamos, pues, por nuestra propia tragedia!"
+}

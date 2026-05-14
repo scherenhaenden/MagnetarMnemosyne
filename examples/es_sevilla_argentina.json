@@ -1,0 +1,19 @@
+{
+  "speakers": [
+    {
+      "id": "andalucia_sevilla",
+      "label": "Sevillano",
+      "descriptor": "hombre con acento de Sevilla, voz clara y apasionada",
+      "reference_audio_url": "/Users/edwardflores/Projects/Development/MagnetarMnemosyne/assets/reference-voices-more/andalucia_paginas_sevillanas_00_ref.wav",
+      "reference_text": "Sevilla no es solo una ciudad, es un sentimiento que se lleva en el alma y se expresa en cada rincón de sus calles estrechas."
+    },
+    {
+      "id": "argentina_terror",
+      "label": "Visitante Argentino",
+      "descriptor": "voz argentina dramática, estilo nocturno",
+      "reference_audio_url": "/Users/edwardflores/Projects/Development/MagnetarMnemosyne/assets/reference-voices-more/argentina_nocturno_ref.wav",
+      "reference_text": "La noche en la ciudad era un eco de pasos lejanos y sombras que bailaban bajo la luz de los faroles."
+    }
+  ],
+  "dialogue": "Sevillano (hombre con acento de Sevilla, voz clara y apasionada):\n[entusiasta]\n¡Fíjese usted, caballero! Estas páginas sevillanas que le muestro no son papel y tinta, son la esencia misma de nuestra tierra. ¿Siente el aroma del azahar?\n\nVisitante Argentino (voz argentina dramática, estilo nocturno):\n[intrigado]\nEs fascinante, che. En Buenos Aires tenemos nuestras luces, pero este aire de Sevilla tiene algo... algo antiguo, como un nocturno de piano que se niega a terminar.\n\nSevillano (hombre con acento de Sevilla, voz clara y apasionada):\n[orgulloso]\nEs que aquí el tiempo se detiene en los patios, y cada carta-prólogo es una invitación a conocer el corazón de Andalucía. No hay prisa cuando se habla de belleza.\n\nVisitante Argentino (voz argentina dramática, estilo nocturno):\nTenés razón. A veces, para encontrarse, hay que perderse en las calles de una ciudad que sabe soñar despierta. Servime otro vino, que la noche recién empieza."
+}

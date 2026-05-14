@@ -1,0 +1,54 @@
+metadata:
+  project_name: "magnetar-mnemosyne"
+  display_name: "Magnetar Mnemosyne"
+  description: "Canonical project schema for a modular exam platform with listening-comprehension and local audio generation workflows."
+  start_date: "2026-05-14"
+  repository_type: "application"
+
+stakeholders:
+  - name: "Project Owner"
+    role: "product_owner"
+    contact: "owner@example.com"
+  - name: "Platform Lead"
+    role: "technical_lead"
+    contact: "lead@example.com"
+
+milestones:
+  - id: "ms-01"
+    name: "Core Exam Platform Baseline"
+    target_date: "2026-05-20"
+  - id: "ms-02"
+    name: "Audio Conversation Authoring"
+    target_date: "2026-05-27"
+  - id: "ms-03"
+    name: "Local TTS Rendering Integration"
+    target_date: "2026-06-03"
+
+tasks:
+  - id: "task-exam-core-hardening"
+    title: "Harden exam flow, schema behavior, and admin CRUD"
+    owner: "platform"
+    state: "in_review"
+    milestone_id: "ms-01"
+  - id: "task-audio-scene-schema"
+    title: "Define structured conversation payload format"
+    owner: "platform"
+    state: "done"
+    milestone_id: "ms-02"
+  - id: "task-local-tts-runner"
+    title: "Implement local AI audio render runner"
+    owner: "platform"
+    state: "ready"
+    milestone_id: "ms-03"
+
+risks:
+  - id: "risk-local-model-setup"
+    description: "Local model requirements may differ per machine."
+    impact: "medium"
+    mitigation: "Document backend contract, checkpoint policy, and environment expectations."
+
+reporting:
+  status_file: "STATUS.md"
+  plan_file: "PLAN.md"
+  bitacora_file: "BITACORA.md"
+  blockers_file: "BLOCKERS.md"

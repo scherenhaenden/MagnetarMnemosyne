@@ -1,0 +1,19 @@
+{
+  "speakers": [
+    {
+      "id": "tomsawyer",
+      "label": "Tom Sawyer",
+      "descriptor": "adult man with a classic storytelling voice, slightly mischievous",
+      "reference_audio_url": "/Users/edwardflores/Projects/Development/MagnetarMnemosyne/assets/reference-voices/en_male_tomsawyer_ref.wav",
+      "reference_text": "Monday morning found Tom Sawyer miserable. Monday morning always found him so because it began another week's slow suffering in school."
+    },
+    {
+      "id": "huckfinn",
+      "label": "Huckleberry Finn (Female Narrator)",
+      "descriptor": "adult woman with a warm, southern-tinged storytelling voice",
+      "reference_audio_url": "/Users/edwardflores/Projects/Development/MagnetarMnemosyne/assets/reference-voices/en_female_huck_ref.wav",
+      "reference_text": "You don't know about me without you have read a book by the name of The Adventures of Tom Sawyer; but that ain't no matter."
+    }
+  ],
+  "dialogue": "Tom Sawyer (adult man with a classic storytelling voice, slightly mischievous):\n[excitedly]\nNow look here, Huck, we've got to find that treasure. It's hidden right under the old tree by the haunted house. I'm certain of it!\n\nHuckleberry Finn (Female Narrator) (adult woman with a warm, southern-tinged storytelling voice):\n[skeptical]\nI don't know, Tom. Ghosts don't like people digging around their property. And besides, school starts in an hour. You don't want to be late again.\n\nTom Sawyer (adult man with a classic storytelling voice, slightly mischievous):\n[dismissive]\nSchool! Who cares about school when there's gold to be found? We'll be rich, Huck! We can buy all the fishing poles and tobacco we want.\n\nHuckleberry Finn (Female Narrator) (adult woman with a warm, southern-tinged storytelling voice):\n[thoughtful]\nWell, when you put it that way... I suppose a little digging won't hurt. But if I see a shadow that looks like a ghost, I'm heading straight for the river!"
+}

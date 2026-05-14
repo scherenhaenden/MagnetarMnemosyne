@@ -1,0 +1,19 @@
+{
+  "speakers": [
+    {
+      "id": "venezuela_tristan",
+      "label": "Tristán Cataletto",
+      "descriptor": "hombre venezolano con voz profunda y misteriosa",
+      "reference_audio_url": "/Users/edwardflores/Projects/Development/MagnetarMnemosyne/assets/reference-voices-more/venezuela_tristan_cataletto_ref.wav",
+      "reference_text": "El espectro se acercaba lentamente, y en su mirada no había odio, sino una tristeza infinita que helaba la sangre."
+    },
+    {
+      "id": "venezuela_espectro",
+      "label": "Luis López",
+      "descriptor": "voz venezolana suave, casi un susurro espectral",
+      "reference_audio_url": "/Users/edwardflores/Projects/Development/MagnetarMnemosyne/assets/reference-voices-more/venezuela_beso_espectro_ref.wav",
+      "reference_text": "Solo un beso, pidió la sombra, un beso que me devuelva el calor de la vida por un instante."
+    }
+  ],
+  "dialogue": "Tristán Cataletto (hombre venezolano con voz profunda y misteriosa):\n[asustado]\n¿Quién anda ahí? Puedo sentir el frío de su presencia, aunque mis ojos solo vean la bruma de la noche caraqueña.\n\nLuis López (voz venezolana suave, casi un susurro espectral):\n[susurrando]\nNo temas, Tristán. Solo soy un recuerdo que busca el camino de regreso. ¿Acaso has olvidado la promesa que hiciste bajo el Samán?\n\nTristán Cataletto (hombre venezolano con voz profunda y misteriosa):\n[conmovido]\nEsa voz... es imposible. Han pasado tantos años desde que te fuiste. Los cuentos de terror no decían que el regreso fuera tan... tan real.\n\nLuis López (voz venezolana suave, casi un susurro espectral):\nLo real es solo lo que el corazón permite existir. Escucha el viento en las hojas; ahí me encontrarás, siempre esperando un beso que nunca llegó."
+}

@@ -1,0 +1,19 @@
+{
+  "speakers": [
+    {
+      "id": "sherlock",
+      "label": "Sherlock Holmes",
+      "descriptor": "hombrre adulto con voz analítica y profunda",
+      "reference_audio_url": "/Users/edwardflores/Projects/Development/MagnetarMnemosyne/assets/reference-voices/es_male_sherlock_ref.wav",
+      "reference_text": "Para un cerebro lógico, todas las cosas deben ser exactamente lo que son, y subestimarse a sí mismo es tan alejarse de la verdad como exagerar las propias facultades."
+    },
+    {
+      "id": "poe",
+      "label": "Edgar Allan Poe",
+      "descriptor": "hombre adulto con tono dramático y sombrío",
+      "reference_audio_url": "/Users/edwardflores/Projects/Development/MagnetarMnemosyne/assets/reference-voices/es_male_cuervo_ref.wav",
+      "reference_text": "Y el Cuervo, nunca emprendiendo el vuelo, todavía está sentado, todavía está sentado sobre el pálido busto de Palas."
+    }
+  ],
+  "dialogue": "Sherlock Holmes (hombrre adulto con voz analítica y profunda):\n[curioso]\n¿Dígame, señor Poe, qué clase de lógica encuentra usted en un ave que repite incansablemente la misma palabra? Me parece un caso de repetición obsesiva más que de presagio sobrenatural.\n\nEdgar Allan Poe (hombre adulto con tono dramático y sombrío):\n[sombrío]\nAh, querido Holmes, la lógica del corazón es un abismo que su ciencia no puede medir. El Cuervo no es un animal, es el eco de una pérdida que no tiene fin. ¿No siente usted el peso del 'Nunca más' en esta habitación?\n\nSherlock Holmes (hombrre adulto con voz analítica y profunda):\n[analítico]\nObservo el peso de la melancolía, ciertamente. Pero recuerde: cuando se elimina lo imposible, lo que queda, por improbable que parezca, debe ser la verdad. Y la verdad aquí es que usted necesita una distracción de sus sombras.\n\nEdgar Allan Poe (hombre adulto con tono dramático y sombrío):\nLas sombras son mi única compañía, Holmes. No hay lógica que pueda devolver la luz a quien ha visto el fondo del abismo."
+}

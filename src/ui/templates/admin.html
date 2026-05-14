@@ -29,6 +29,7 @@
         <div class="flex gap-8 border-b border-slate-200 dark:border-slate-800 mb-8">
             <a href="/admin?tab=questions" class="pb-4 font-semibold {% if active_tab == 'questions' %}tab-active{% else %}opacity-50{% endif %}">Preguntas</a>
             <a href="/admin?tab=exams" class="pb-4 font-semibold {% if active_tab == 'exams' %}tab-active{% else %}opacity-50{% endif %}">Exámenes</a>
+            <a href="/admin?tab=audios" class="pb-4 font-semibold {% if active_tab == 'audios' %}tab-active{% else %}opacity-50{% endif %}">Audios</a>
             <a href="/admin?tab=results" class="pb-4 font-semibold {% if active_tab == 'results' %}tab-active{% else %}opacity-50{% endif %}">Resultados</a>
         </div>
 
@@ -67,6 +68,13 @@
                     <form action="/admin/import" method="POST" class="space-y-4">
                         <textarea name="json_data" placeholder='[{"type": "multiple_choice", ...}]' class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-mono text-xs" rows="5"></textarea>
                         <button type="submit" class="w-full bg-slate-700 text-white font-bold py-2 rounded-xl text-sm">Importar</button>
+                    </form>
+                </div>
+                <div class="bg-white dark:bg-[#1c1f26] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl mt-8">
+                    <h2 class="text-xl font-bold mb-4 dark:text-white">Importar Conversación</h2>
+                    <form action="/admin/import/conversation" method="POST" class="space-y-4">
+                        <textarea name="json_data" placeholder='{"question":"Escucha la conversación...","conversation":{"speakers":[...],"dialogue":"Teacher (...)..."}}' class="w-full p-2 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-mono text-xs" rows="9"></textarea>
+                        <button type="submit" class="w-full bg-[#a5c0ff] text-[#0f1115] font-bold py-2 rounded-xl text-sm">Crear Pregunta de Audio</button>
                     </form>
                 </div>
             </div>
@@ -152,6 +160,364 @@
                 {% endfor %}
             </div>
         </div>
+        {% endif %}
+
+        {% if active_tab == 'audios' %}
+        {% set audio_questions = questions | selectattr('type', 'equalto', 'audio_listening') | list %}
+        {% if view_mode == 'create' %}
+        <div class="space-y-8 animate-fade-in">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold dark:text-white">Crear Audio</h2>
+                    <p class="text-sm opacity-60 mt-1">Define primero la escena y luego los ajustes de render.</p>
+                </div>
+                <a href="/admin?tab=audios" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 font-semibold hover:opacity-90">Volver al grid</a>
+            </div>
+
+            <form action="/admin/audios/create" method="POST" class="space-y-8" onsubmit="const status=document.getElementById('audio-create-progress'); if(status){ status.classList.remove('hidden'); } const renderButton=this.querySelector('button[value=render]'); if(renderButton && document.activeElement===renderButton){ renderButton.dataset.originalText=renderButton.textContent; renderButton.textContent='Creando audio...'; renderButton.disabled=true; }">
+                <div class="bg-white dark:bg-[#1c1f26] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl">
+                    <div class="mb-5">
+                        <h3 class="text-xl font-bold dark:text-white">Descripción del Audio</h3>
+                        <p class="text-sm opacity-60 mt-1">Metadatos básicos y payload estructurado de la conversación.</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="grid lg:grid-cols-2 gap-4">
+                            <input type="text" name="title" value="{{ audio_form_data.title if audio_form_data else '' }}" placeholder="Título de la escena" class="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                            <textarea name="scene_description" placeholder="Descripción de la situación" class="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700" rows="3">{{ audio_form_data.scene_description if audio_form_data else '' }}</textarea>
+                        </div>
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <input type="text" name="language" value="{{ audio_form_data.language if audio_form_data else '' }}" placeholder="Idioma (ej. es-ES)" class="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                            <input type="text" name="difficulty" value="{{ audio_form_data.difficulty if audio_form_data else '' }}" placeholder="Nivel (ej. A1)" class="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                        </div>
+                        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm">
+                            <p class="font-semibold mb-2">Qué poner en `conversation_json`</p>
+                            <p class="opacity-70 mb-3">Define `speakers` con `reference_audio_url` y `reference_text`, y luego el `dialogue` con bloques `Speaker (...)` o una lista `turns`. Hay un ejemplo listo en <span class="font-mono">examples/audios/f5tts-audio-template.txt</span>.</p>
+                            <pre class="text-xs whitespace-pre-wrap overflow-x-auto">{
+  "speakers": [
+    {
+      "id": "teacher",
+      "label": "Teacher",
+      "descriptor": "calm Spanish woman from Madrid",
+      "reference_audio_url": "/ruta/profe.wav",
+      "reference_text": "Buenos días. ¿Cómo te llamas?"
+    },
+    {
+      "id": "student",
+      "label": "Student",
+      "descriptor": "young girl, slightly nervous",
+      "reference_audio_url": "/ruta/alumna.wav",
+      "reference_text": "Hola. Me llamo Lía."
+    }
+  ],
+  "dialogue": "Teacher (calm Spanish woman from Madrid):\n[warmly]\nBuenos días. ¿Cómo te llamas?\n\nStudent (young girl, slightly nervous):\n[nervous]\nHola. Me llamo Lía."
+}</pre>
+                        </div>
+                        <textarea name="conversation_json" required placeholder='JSON de conversación: {"speakers":[{"id":"teacher","label":"Teacher","descriptor":"calm Spanish woman from Madrid","reference_audio_url":"/ruta/profe.wav","reference_text":"Buenos días, soy la profesora."},{"id":"student","label":"Student","descriptor":"young girl, slightly nervous","reference_audio_url":"/ruta/alumna.wav","reference_text":"Hola, me llamo Lía."}],"dialogue":"Teacher (...)&#10;..."}' class="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-mono text-xs" rows="16">{{ audio_form_data.conversation_json if audio_form_data else '' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-[#1c1f26] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl">
+                    <div class="mb-5">
+                        <h3 class="text-xl font-bold dark:text-white">Settings de Creación</h3>
+                        <p class="text-sm opacity-60 mt-1">El backend y su configuración salen de <span class="font-mono">appsettings.json</span>. Aquí solo eliges el motor y el nombre final del archivo.</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <select name="backend" class="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                                {% for backend_option in audio_backend_options %}
+                                <option value="{{ backend_option.id }}" {% if audio_form_data and audio_form_data.backend == backend_option.id %}selected{% endif %}>{{ backend_option.label }}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="text" name="output_name" value="{{ audio_form_data.output_name if audio_form_data else '' }}" placeholder="Nombre del archivo de salida, ej. lia-entrevista-001.wav" class="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                        </div>
+                    </div>
+                    {% if audio_create_error %}
+                    <div id="audio-create-error-box" class="mt-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900">
+                        <div class="text-xs font-bold uppercase tracking-widest text-red-700 dark:text-red-400">Error al crear audio</div>
+                        <div id="audio-create-error-text" class="text-sm mt-2 break-words opacity-90 whitespace-pre-wrap">{{ audio_create_error }}</div>
+                    </div>
+                    {% else %}
+                    <div id="audio-create-error-box" class="hidden mt-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900">
+                        <div class="text-xs font-bold uppercase tracking-widest text-red-700 dark:text-red-400">Error al crear audio</div>
+                        <div id="audio-create-error-text" class="text-sm mt-2 break-words opacity-90 whitespace-pre-wrap"></div>
+                    </div>
+                    {% endif %}
+                    {% if audio_create_success %}
+                    <div id="audio-create-success-box" class="mt-6 p-4 rounded-2xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900">
+                        <div class="text-xs font-bold uppercase tracking-widest text-green-700 dark:text-green-400">Éxito</div>
+                        <div id="audio-create-success-text" class="text-sm mt-2 break-words opacity-90">{{ audio_create_success }}</div>
+                    </div>
+                    {% else %}
+                    <div id="audio-create-success-box" class="hidden mt-6 p-4 rounded-2xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900">
+                        <div class="text-xs font-bold uppercase tracking-widest text-green-700 dark:text-green-400">Éxito</div>
+                        <div id="audio-create-success-text" class="text-sm mt-2 break-words opacity-90"></div>
+                    </div>
+                    {% endif %}
+                    <div id="audio-create-progress" class="{% if audio_render_job_id %}mt-6{% else %}hidden mt-6{% endif %} p-4 rounded-2xl bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900">
+                        <div class="text-xs font-bold uppercase tracking-widest text-blue-700 dark:text-blue-400">Render en progreso</div>
+                        <div id="audio-create-progress-message" class="text-sm mt-2 opacity-90">{% if created_audio_question and created_audio_question.conversation_payload and created_audio_question.conversation_payload.render and created_audio_question.conversation_payload.render.progress_message %}{{ created_audio_question.conversation_payload.render.progress_message }}{% else %}Se está creando el audio. La página mostrará el resultado cuando termine.{% endif %}</div>
+                        <div class="mt-3 h-3 rounded-full bg-blue-100 dark:bg-blue-900 overflow-hidden">
+                            <div id="audio-create-progress-bar" class="h-full bg-[#a5c0ff] transition-all duration-300" style="width: {{ created_audio_question.conversation_payload.render.progress if created_audio_question and created_audio_question.conversation_payload and created_audio_question.conversation_payload.render and created_audio_question.conversation_payload.render.progress is defined else 0 }}%;"></div>
+                        </div>
+                        <div id="audio-create-progress-percent" class="text-xs mt-2 opacity-70">{{ created_audio_question.conversation_payload.render.progress if created_audio_question and created_audio_question.conversation_payload and created_audio_question.conversation_payload.render and created_audio_question.conversation_payload.render.progress is defined else 0 }}%</div>
+                    </div>
+                    {% if created_audio_question and created_audio_question.audio_url %}
+                    <div id="audio-create-player" class="mt-6">
+                        <audio controls class="w-full">
+                            <source id="audio-create-source" src="{{ created_audio_question.audio_url }}" type="audio/wav">
+                        </audio>
+                    </div>
+                    {% else %}
+                    <div id="audio-create-player" class="mt-6 hidden">
+                        <audio controls class="w-full">
+                            <source id="audio-create-source" src="" type="audio/wav">
+                        </audio>
+                    </div>
+                    {% endif %}
+                    {% if created_audio_question %}
+                    <div class="mt-6 grid sm:grid-cols-2 gap-3 text-sm">
+                        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+                            <div class="opacity-50">Estado</div>
+                            <div id="audio-create-status" class="font-semibold">{{ created_audio_question.conversation_payload.render.status if created_audio_question.conversation_payload and created_audio_question.conversation_payload.render else 'pending' }}</div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+                            <div class="opacity-50">URL de reproducción</div>
+                            <div id="audio-create-url" class="font-semibold break-all">{{ created_audio_question.audio_url or 'N/D' }}</div>
+                        </div>
+                        {% if created_audio_question.conversation_payload and created_audio_question.conversation_payload.render %}
+                        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 sm:col-span-2">
+                            <div class="opacity-50">Ruta local del archivo</div>
+                            <div id="audio-create-local-path" class="font-semibold break-all">{{ created_audio_question.conversation_payload.render.local_audio_path or created_audio_question.conversation_payload.render.output_path or 'N/D' }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    <div class="mt-6 flex flex-wrap gap-3">
+                        <button type="submit" name="submit_action" value="render" class="bg-[#a5c0ff] text-[#0f1115] font-bold py-3 px-6 rounded-xl hover:opacity-90">Crear Audio</button>
+                        <button type="submit" name="submit_action" value="save" class="bg-slate-700 text-white font-semibold py-3 px-6 rounded-xl hover:opacity-90">Guardar Borrador</button>
+                        <a href="/admin?tab=audios" class="bg-slate-200 dark:bg-slate-800 font-semibold py-3 px-6 rounded-xl hover:opacity-90">Cancelar</a>
+                    </div>
+                </div>
+            </form>
+            {% if audio_render_job_id %}
+            <script>
+                (() => {
+                    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+                    const socket = new WebSocket(`${protocol}://${window.location.host}/ws/audio-jobs/{{ audio_render_job_id }}`);
+                    const progressBox = document.getElementById("audio-create-progress");
+                    const progressMessage = document.getElementById("audio-create-progress-message");
+                    const progressBar = document.getElementById("audio-create-progress-bar");
+                    const progressPercent = document.getElementById("audio-create-progress-percent");
+                    const statusNode = document.getElementById("audio-create-status");
+                    const urlNode = document.getElementById("audio-create-url");
+                    const localPathNode = document.getElementById("audio-create-local-path");
+                    const playerWrapper = document.getElementById("audio-create-player");
+                    const audioSource = document.getElementById("audio-create-source");
+                    const errorBox = document.getElementById("audio-create-error-box");
+                    const errorText = document.getElementById("audio-create-error-text");
+                    const successBox = document.getElementById("audio-create-success-box");
+                    const successText = document.getElementById("audio-create-success-text");
+
+                    socket.onmessage = (event) => {
+                        const payload = JSON.parse(event.data);
+                        if (progressBox) progressBox.classList.remove("hidden");
+                        if (progressMessage) progressMessage.textContent = payload.message || "Procesando audio...";
+                        if (progressBar) progressBar.style.width = `${payload.progress || 0}%`;
+                        if (progressPercent) progressPercent.textContent = `${payload.progress || 0}%`;
+                        if (statusNode) statusNode.textContent = payload.status || "running";
+                        if (payload.local_audio_path && localPathNode) localPathNode.textContent = payload.local_audio_path;
+                        if (payload.audio_url && urlNode) urlNode.textContent = payload.audio_url;
+
+                        if (payload.status === "completed") {
+                            if (audioSource && payload.audio_url) {
+                                audioSource.src = payload.audio_url;
+                                audioSource.parentElement.load();
+                            }
+                            if (playerWrapper) playerWrapper.classList.remove("hidden");
+                            if (successBox && successText) {
+                                successBox.classList.remove("hidden");
+                                successText.replaceChildren(document.createTextNode("Audio creado y renderizado correctamente."));
+                            }
+                            socket.close();
+                        }
+
+                        if (payload.status === "failed") {
+                            if (errorBox && errorText) {
+                                errorBox.classList.remove("hidden");
+                                let errorMsg = payload.error || "El render falló.";
+                                if (payload.backend_stderr) {
+                                    errorMsg += "\n\n--- STDERR ---\n" + payload.backend_stderr;
+                                }
+                                if (payload.backend_stdout) {
+                                    errorMsg += "\n\n--- STDOUT ---\n" + payload.backend_stdout;
+                                }
+                                if (payload.backend_command) {
+                                    errorMsg += "\n\n--- COMMAND ---\n" + payload.backend_command;
+                                }
+                                errorText.replaceChildren(document.createTextNode(errorMsg));
+                            }
+                            socket.close();
+                        }
+                    };
+                })();
+            </script>
+            {% endif %}
+
+        </div>
+        {% else %}
+        <div class="space-y-8 animate-fade-in">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold dark:text-white">Audios</h2>
+                    <p class="text-sm opacity-60 mt-1">Escenas de listening disponibles para el banco de preguntas.</p>
+                </div>
+                <a href="/admin?tab=audios&mode=create" class="px-5 py-3 rounded-xl bg-[#a5c0ff] text-[#0f1115] font-bold hover:opacity-90">Crear Audio</a>
+            </div>
+
+            {% if audio_questions %}
+            <div class="grid xl:grid-cols-2 gap-6">
+                {% for q in audio_questions %}
+                <div class="bg-white dark:bg-[#1c1f26] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-widest px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 opacity-70">audio #{{ q.id }}</span>
+                            <p class="text-lg font-medium mt-3 whitespace-pre-wrap">{{ q.question }}</p>
+                        </div>
+                        <form action="/admin/delete/{{ q.id }}" method="POST">
+                            <button type="submit" class="text-red-500 hover:opacity-80">Eliminar</button>
+                        </form>
+                    </div>
+
+                    {% if q.conversation_payload %}
+                    <div class="mt-4 grid sm:grid-cols-3 gap-3 text-sm">
+                        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+                            <div class="opacity-50">Idioma</div>
+                            <div class="font-semibold">{{ q.conversation_payload.language or 'N/D' }}</div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+                            <div class="opacity-50">Nivel</div>
+                            <div class="font-semibold">{{ q.conversation_payload.difficulty or 'N/D' }}</div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+                            <div class="opacity-50">Estado</div>
+                            <div class="font-semibold">{{ q.conversation_payload.render.status if q.conversation_payload.render else 'pending' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        {% for speaker in q.conversation_payload.speakers %}
+                        <span class="text-xs bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">{{ speaker.label }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mt-4 p-4 rounded-2xl {% if q.audio_url %}bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900{% else %}bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900{% endif %}">
+                        <div class="text-xs font-bold uppercase tracking-widest {% if q.audio_url %}text-green-700 dark:text-green-400{% else %}text-amber-700 dark:text-amber-400{% endif %}">
+                            {% if q.audio_url %}Audio creado{% else %}Pendiente de crear{% endif %}
+                        </div>
+                        <div class="text-sm mt-2 break-all opacity-80">
+                            {% if q.audio_url %}{{ q.audio_url }}{% else %}Todavía no hay archivo generado o enlazado.{% endif %}
+                        </div>
+                    </div>
+                    {% if q.conversation_payload.render and q.conversation_payload.render.last_error %}
+                    <div class="mt-4 p-4 rounded-2xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900">
+                        <div class="text-xs font-bold uppercase tracking-widest text-red-700 dark:text-red-400">Último error de render</div>
+                        <div class="text-sm mt-2 break-words opacity-90 whitespace-pre-wrap">{{ q.conversation_payload.render.last_error }}{% if q.conversation_payload.render.backend_stderr %}
+
+--- STDERR ---
+{{ q.conversation_payload.render.backend_stderr }}{% endif %}{% if q.conversation_payload.render.backend_stdout %}
+
+--- STDOUT ---
+{{ q.conversation_payload.render.backend_stdout }}{% endif %}{% if q.conversation_payload.render.backend_command %}
+
+--- COMMAND ---
+{{ q.conversation_payload.render.backend_command }}{% endif %}</div>
+                    </div>
+                    {% endif %}
+
+                    {% if q.audio_url %}
+                    <div class="mt-4">
+                        <audio controls class="w-full">
+                            <source src="{{ q.audio_url }}" type="audio/mpeg">
+                        </audio>
+                    </div>
+                    {% else %}
+                    <div class="mt-4">
+                        <form action="/admin/audios/render/{{ q.id }}" method="POST">
+                            <button type="submit" class="w-full bg-[#a5c0ff] text-[#0f1115] font-bold py-3 rounded-xl hover:opacity-90">Renderizar Audio</button>
+                        </form>
+                    </div>
+                    {% endif %}
+
+                    <details class="mt-4">
+                        <summary class="cursor-pointer text-sm font-semibold opacity-80">Ver detalle</summary>
+                        <div class="mt-4 space-y-4">
+                            {% if q.conversation_payload.render %}
+                            <div class="grid sm:grid-cols-3 gap-3 text-sm">
+                                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+                                    <div class="opacity-50">Backend</div>
+                                    <div class="font-semibold">{{ q.conversation_payload.render.backend or 'N/D' }}</div>
+                                </div>
+                                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+                                    <div class="opacity-50">Modelo</div>
+                                    <div class="font-semibold">{{ q.conversation_payload.render.model or 'N/D' }}</div>
+                                </div>
+                                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+                                    <div class="opacity-50">Checkpoint</div>
+                                    <div class="font-semibold break-all">{{ q.conversation_payload.render.checkpoint or 'N/D' }}</div>
+                                </div>
+                            </div>
+                            <div class="grid sm:grid-cols-2 gap-3 text-sm">
+                                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+                                    <div class="opacity-50">Output Path</div>
+                                    <div class="font-semibold break-all">{{ q.conversation_payload.render.output_path or 'Auto' }}</div>
+                                </div>
+                                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+                                    <div class="opacity-50">Backend Command</div>
+                                    <div class="font-semibold break-all">{{ q.conversation_payload.render.backend_command or 'No ejecutado' }}</div>
+                                </div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 text-sm">
+                                <div class="opacity-50">Backend Stdout</div>
+                                <div class="font-semibold whitespace-pre-wrap break-words">{{ q.conversation_payload.render.backend_stdout or 'Sin salida todavía' }}</div>
+                            </div>
+                            <div class="grid sm:grid-cols-2 gap-3 text-sm">
+                                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+                                    <div class="opacity-50">F5 Root</div>
+                                    <div class="font-semibold break-all">{{ q.conversation_payload.render.f5_tts_root or 'N/D' }}</div>
+                                </div>
+                                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+                                    <div class="opacity-50">Device</div>
+                                    <div class="font-semibold">{{ q.conversation_payload.render.device or 'N/D' }}</div>
+                                </div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 text-sm">
+                                <div class="opacity-50">Kokoro Renderer Root</div>
+                                <div class="font-semibold break-all">{{ q.conversation_payload.render.kokoro_renderer_root or 'N/D' }}</div>
+                            </div>
+                            {% endif %}
+                            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 text-sm whitespace-pre-wrap max-h-72 overflow-y-auto">
+                                {% for turn in q.conversation_payload.turns %}
+                                {% set speaker = (q.conversation_payload.speakers | selectattr('id', 'equalto', turn.speaker_id) | list | first) %}
+{{ speaker.label if speaker else turn.speaker_id }}:
+{{ turn.text }}
+
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </details>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="bg-white dark:bg-[#1c1f26] p-10 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-center">
+                <h3 class="text-xl font-bold dark:text-white">No hay audios todavía</h3>
+                <p class="text-sm opacity-60 mt-2">Crea la primera escena de listening desde el panel de administración.</p>
+                <a href="/admin?tab=audios&mode=create" class="inline-block mt-5 px-5 py-3 rounded-xl bg-[#a5c0ff] text-[#0f1115] font-bold hover:opacity-90">Crear Audio</a>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
         {% endif %}
 
         {% if active_tab == 'results' %}

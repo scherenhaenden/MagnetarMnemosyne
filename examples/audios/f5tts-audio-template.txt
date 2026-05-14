@@ -1,0 +1,48 @@
+TITLE
+entrevista escolar de nivel A1
+
+SCENE_DESCRIPTION
+Una profesora habla con una alumna en un contexto escolar. El audio debe sonar natural, claro y adecuado para un examen de comprensión auditiva.
+
+LANGUAGE
+es-ES
+
+DIFFICULTY
+A1
+
+CONVERSATION_JSON
+{
+  "speakers": [
+    {
+      "id": "teacher",
+      "label": "Teacher",
+      "descriptor": "calm Spanish woman from Madrid",
+      "reference_audio_url": "/absolute/path/to/teacher-reference.wav",
+      "reference_text": "Buenos días. ¿Cómo te llamas?"
+    },
+    {
+      "id": "student",
+      "label": "Student",
+      "descriptor": "young girl, slightly nervous",
+      "reference_audio_url": "/absolute/path/to/student-reference.wav",
+      "reference_text": "Hola. Me llamo Lía."
+    }
+  ],
+  "dialogue": "Teacher (calm Spanish woman from Madrid):\n[warmly]\nBuenos días. ¿Cómo te llamas?\n\nStudent (young girl, slightly nervous):\n[nervous]\nHola. Me llamo Lía.\n\nTeacher (calm Spanish woman from Madrid):\nMuy bien, Lía. ¿Cuántos años tienes?\n\nStudent (young girl, slightly nervous):\nTengo doce años."
+}
+
+F5TTS_SETTINGS
+backend = f5-tts
+model = F5TTS_Base
+checkpoint = hf://jpgallegoar/F5-Spanish/model_1200000.safetensors
+vocab_file = hf://jpgallegoar/F5-Spanish/vocab.txt
+f5_tts_root = /Users/edwardflores/Projects/Development/F5-TTS
+device = mps
+output_path = /Users/edwardflores/Projects/Development/MagnetarMnemosyne/src/generated_audio/entrevista-escolar-a1.wav
+
+NOTES
+- Cada speaker necesita su propio reference_audio_url.
+- Cada speaker necesita su propio reference_text, que debe corresponder exactamente a lo que se oye en su audio de referencia.
+- Lo ideal para cada referencia es un audio limpio de entre 3 y 12 segundos.
+- El campo dialogue debe usar labels que coincidan con speakers[].label.
+- Para más de dos speakers, añade más objetos dentro de speakers y usa sus labels en dialogue.

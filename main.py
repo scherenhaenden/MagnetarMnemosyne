@@ -16,6 +16,7 @@ def main():
     try:
         auto_import("fastapi")
         auto_import("uvicorn")
+        auto_import("websockets")
         auto_import("jinja2")
         auto_import("python-multipart") # Necessary for Form data in FastAPI
         print("Web modules ready.")

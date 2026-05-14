@@ -1,0 +1,19 @@
+{
+  "speakers": [
+    {
+      "id": "gaucho",
+      "label": "Martín Fierro",
+      "descriptor": "hombre con acento gaucho argentino, voz ruda y melódica",
+      "reference_audio_url": "/Users/edwardflores/Projects/Development/MagnetarMnemosyne/assets/reference-voices-more/argentina_martin_fierro_ref.wav",
+      "reference_text": "Aquí me pongo a cantar al compás de la vigüela, que el hombre que lo desvela una pena estraordinaria como la ave solitaria con el cantar se consuela."
+    },
+    {
+      "id": "argentina_narrator",
+      "label": "Narrador Argentino",
+      "descriptor": "voz masculina argentina, tono pausado y culto",
+      "reference_audio_url": "/Users/edwardflores/Projects/Development/MagnetarMnemosyne/assets/reference-voices-more/argentina_antologia_01_ref.wav",
+      "reference_text": "La selva de los reptiles era un lugar donde el tiempo parecía haberse detenido entre las escamas y el barro."
+    }
+  ],
+  "dialogue": "Narrador Argentino (voz masculina argentina, tono pausado y culto):\n[con misterio]\nEn la inmensidad de la pampa, donde el viento cuenta historias de hombres libres, se escuchó una voz que parecía brotar de la misma tierra.\n\nMartín Fierro (hombre con acento gaucho argentino, voz ruda y melódica):\n[orgulloso]\nVea, amigo, que uno no canta por cantar, ni porque tiene buena voz. Uno canta porque el pecho le ensancha la pena y necesita soltarla al aire como quien suelta un lazo.\n\nNarrador Argentino (voz masculina argentina, tono pausado y culto):\n[reflexivo]\nY así, entre trago y trago de amargo, el gaucho fue hilando sus penas, convirtiendo el dolor en poesía y el destino en una huella sobre el camino.\n\nMartín Fierro (hombre con acento gaucho argentino, voz ruda y melódica):\nCantando me he de morir, cantando me han de enterrar, y cantando he de llegar al pie del Eterno Padre. Desde el vientre de mi madre vine a este mundo a cantar."
+}

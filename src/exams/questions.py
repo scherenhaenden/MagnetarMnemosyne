@@ -22,7 +22,8 @@ def init_db():
             options TEXT, 
             correct_answer_index INTEGER,
             explanation TEXT,
-            audio_url TEXT -- URL or path to audio file
+            audio_url TEXT, -- URL or path to audio file
+            conversation_json TEXT
         )
     ''')
     # Exams Table (Grouping of questions)
@@ -34,6 +35,13 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+
+    cursor.execute("PRAGMA table_info(questions)")
+    columns = {row[1] for row in cursor.fetchall()}
+    if "audio_url" not in columns:
+        cursor.execute("ALTER TABLE questions ADD COLUMN audio_url TEXT")
+    if "conversation_json" not in columns:
+        cursor.execute("ALTER TABLE questions ADD COLUMN conversation_json TEXT")
     # Results Table (Student attempts)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS results (
@@ -81,17 +89,46 @@ def load_questions():
         q = dict(row)
         if q["options"]: q["options"] = json.loads(q["options"])
         if "correct_answer_index" in q: q["correctAnswerIndex"] = q["correct_answer_index"]
+        if q.get("conversation_json"):
+            q["conversation_payload"] = json.loads(q["conversation_json"])
         questions.append(q)
     return questions
+
+def get_question(q_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM questions WHERE id = ?', (q_id,))
+    row = cursor.fetchone()
+    conn.close()
+    if row is None:
+        return None
+
+    q = dict(row)
+    if q["options"]:
+        q["options"] = json.loads(q["options"])
+    if "correct_answer_index" in q:
+        q["correctAnswerIndex"] = q["correct_answer_index"]
+    if q.get("conversation_json"):
+        q["conversation_payload"] = json.loads(q["conversation_json"])
+    return q
 
 def save_question(q_data):
     conn = get_db_connection()
     cursor = conn.cursor()
     options_json = json.dumps(q_data.get("options")) if q_data.get("options") else None
+    conversation_json = json.dumps(q_data.get("conversation_payload")) if q_data.get("conversation_payload") else None
     cursor.execute('''
-        INSERT INTO questions (type, question, options, correct_answer_index, explanation)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (q_data["type"], q_data["question"], options_json, q_data.get("correctAnswerIndex"), q_data.get("explanation")))
+        INSERT INTO questions (type, question, options, correct_answer_index, explanation, audio_url, conversation_json)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        q_data["type"],
+        q_data["question"],
+        options_json,
+        q_data.get("correctAnswerIndex"),
+        q_data.get("explanation"),
+        q_data.get("audio_url"),
+        conversation_json,
+    ))
     conn.commit()
     conn.close()
 
@@ -99,6 +136,46 @@ def delete_question(q_id):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('DELETE FROM questions WHERE id = ?', (q_id,))
+    conn.commit()
+    conn.close()
+
+def update_audio_question_assets(q_id, audio_url, render_updates=None):
+    existing = get_question(q_id)
+    if existing is None:
+        return
+
+    conversation_payload = existing.get("conversation_payload") or {}
+    render_section = conversation_payload.get("render") or {}
+    if render_updates:
+        render_section.update(render_updates)
+    conversation_payload["render"] = render_section
+    conversation_payload["audio_url"] = audio_url
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        'UPDATE questions SET audio_url = ?, conversation_json = ? WHERE id = ?',
+        (audio_url, json.dumps(conversation_payload), q_id)
+    )
+    conn.commit()
+    conn.close()
+
+def update_audio_question_render_state(q_id, render_updates):
+    existing = get_question(q_id)
+    if existing is None:
+        return
+
+    conversation_payload = existing.get("conversation_payload") or {}
+    render_section = conversation_payload.get("render") or {}
+    render_section.update(render_updates)
+    conversation_payload["render"] = render_section
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        'UPDATE questions SET conversation_json = ? WHERE id = ?',
+        (json.dumps(conversation_payload), q_id)
+    )
     conn.commit()
     conn.close()
 

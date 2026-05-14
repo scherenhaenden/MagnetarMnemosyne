@@ -1,4 +1,5 @@
 import pytest
+from src.utils import dependency_manager
 from src.utils.dependency_manager import auto_import
 import importlib
 import sys
@@ -28,7 +29,7 @@ def test_auto_import_install_logic(mock_which, mock_check_call):
         mock_import.side_effect = [ImportError, MagicMock()]
         
         # We need to mock _ensure_pip to avoid real subprocess calls
-        with patch("src.utils.dependency_manager._ensure_pip") as mock_ensure:
+        with patch.object(dependency_manager, "_ensure_pip") as mock_ensure:
             auto_import("fake-package")
             
             # Verify pip install was called

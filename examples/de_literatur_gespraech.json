@@ -1,0 +1,19 @@
+{
+  "speakers": [
+    {
+      "id": "goethe",
+      "label": "Johann Wolfgang von Goethe",
+      "descriptor": "älterer Mann mit einer tiefen, weisen und literarischen Stimme",
+      "reference_audio_url": "/Users/edwardflores/Projects/Development/MagnetarMnemosyne/assets/reference-voices/de_goethe_ref.wav",
+      "reference_text": "Man weicht der Welt nicht sicherer aus als durch die Kunst, und man verknüpft sich nicht sicherer mit ihr als durch die Kunst."
+    },
+    {
+      "id": "prosa_narrator",
+      "label": "Erzählerin",
+      "descriptor": "erwachsene Frau mit klarer und erzählerischer Stimme",
+      "reference_audio_url": "/Users/edwardflores/Projects/Development/MagnetarMnemosyne/assets/reference-voices/de_prosa_ref.wav",
+      "reference_text": "Es war ein alter Garten, den niemand mehr pflegte, und doch blühten dort die schönsten Blumen der Erinnerung."
+    }
+  ],
+  "dialogue": "Johann Wolfgang von Goethe (älterer Mann mit einer tiefen, weisen und literarischen Stimme):\n[nachdenklich]\nSagen Sie mir, ist es nicht erstaunlich, wie die Natur in ihrer Einfachheit die komplexesten Gefühle in uns wecken kann? Ein Garten ist wie ein offenes Buch.\n\nErzählerin (erwachsene Frau mit klarer und erzählerischer Stimme):\n[sanft]\nGewiss, Herr Goethe. In diesem alten Garten scheint die Zeit stillzustehen. Jede Blume erzählt von einer vergangenen Epoche, die wir fast vergessen hatten.\n\nJohann Wolfgang von Goethe (älterer Mann mit einer tiefen, weisen und literarischen Stimme):\n[begeistert]\nDas ist die Macht der Kunst! Sie verbindet uns mit dem, was war, und zeigt uns den Weg zu dem, was sein könnte. Die Wahlverwandtschaften zwischen Mensch und Natur sind ewig.\n\nErzählerin (erwachsene Frau mit klarer und erzählerischer Stimme):\nUnd doch müssen wir vorsichtig sein, die Stille nicht zu stören. Manche Geschichten sollten vielleicht im Verborgenen bleiben, so wie die tiefsten Wurzeln dieser Bäume."
+}
