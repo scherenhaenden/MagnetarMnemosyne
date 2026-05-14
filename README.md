@@ -9,12 +9,19 @@ A highly interactive, modular, and resilient exam management system built with *
 
 ## 🚀 Overview
 
-Magnetar Mnemosyne is an "auto-healing" application designed to create and manage complex exams. It supports:
-- **Multiple Choice Questions** (MCQ)
-- **Long Text Answers**
-- **Dynamic Dependency Management** (Auto-installs missing packages at runtime)
-- **Interactive Student UI** (FastAPI + HTMX for a SPA-like experience)
-- **Admin Dashboard** with SQLite persistence and JSON bulk import.
+Magnetar Mnemosyne is an "auto-healing" application designed to create and manage complex educational assessments. It features a seamless student interface and a powerful administrative dashboard.
+
+### Key Capabilities:
+- **Multiple Question Types**: 
+    - **Multiple Choice**: Standard MCQ with immediate feedback.
+    - **Long Text**: Detailed text responses with auto-save.
+    - **Audio Listening**: Integrated player for "listen and write" assessments.
+- **Advanced Exam Management**:
+    - Create and group questions into specific exams (e.g., "Basic Math", "History 101").
+    - Edit and update existing exams dynamically.
+- **Results Tracking**: Comprehensive database of student attempts, scores, and completion dates.
+- **Dynamic Dependency Management**: Auto-installs missing packages (FastAPI, UV, etc.) at runtime.
+- **Interactive UI**: SPA-like experience powered by HTMX, supporting both Dark and Light themes.
 
 ---
 
@@ -22,10 +29,10 @@ Magnetar Mnemosyne is an "auto-healing" application designed to create and manag
 
 ### 1. Prerequisites
 - Python 3.10+
-- `uv` (Optional, but highly recommended for speed)
+- `uv` (Recommended for high-performance dependency management)
 
 ### 2. Running the Application
-The system is designed to be **Zero-Config**. Simply run the main script, and it will handle everything from dependencies to database initialization.
+The system is **Zero-Config**. Running the main script handles environment setup and database migration.
 
 ```bash
 # Using standard Python
@@ -48,7 +55,7 @@ uv run main.py
 ├── run_tests.py          # Coverage-enabled test runner
 ├── src/
 │   ├── ui/               # FastAPI Server & Jinja2 Templates
-│   ├── exams/            # SQLite Database logic & Question management
+│   ├── exams/            # SQLite Database (questions, exams, results)
 │   └── utils/            # Dependency Manager (Auto-healer)
 ├── tests/                # Comprehensive Pytest suite
 └── docs/                 # Detailed documentation
@@ -58,23 +65,21 @@ uv run main.py
 
 ## ⚙️ Core Features
 
-### 🛡️ Auto-Healing Dependency Manager
-The application monitors its own environment. If an import fails, it detects your environment (Standard Pip or UV) and installs the required package **on-the-fly** before continuing execution.
-
 ### 📊 Admin Dashboard
-- **CRUD Operations**: Add and delete questions manually.
-- **Bulk JSON Import**: Paste complex question sets in JSON format to populate the database instantly.
-- **Dark/Light Mode**: Default dark theme with a toggle for accessibility.
+- **Exams Management**: Create, edit, and view specific exams and their contents.
+- **Question CRUD**: Full management of the question bank.
+- **Bulk JSON Import**: Rapidly populate the database by pasting JSON question sets.
+- **Results View**: Monitor student performance with a detailed grading table.
 
-### 📝 Interactive Exams
-- **Live Feedback Mode**: Correct answers and explanations are shown immediately after selection.
-- **Classic Mode**: Results are summarized only at the end of the exam.
-- **HTMX Powered**: Smooth transitions without full page reloads.
+### 📝 Student Experience
+- **Exam Selection**: Students choose their name and assigned exam from a central portal.
+- **Auto-Save**: Text and audio responses are saved in real-time as the student types.
+- **Hybrid Feedback**: Choose between interactive (live correction) and classic (end-of-exam summary) modes.
 
 ---
 
 ## 🧪 Testing & Quality
-We aim for high reliability. The project includes a full suite of tests with coverage reporting.
+The project targets **100% test coverage** for maximum reliability.
 
 ```bash
 python3 run_tests.py
