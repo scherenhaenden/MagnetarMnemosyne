@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from exams.questions import EXAM_QUESTIONS, save_questions, load_questions
+from exams.questions import save_question, load_questions, delete_question
 import uvicorn
 import os
 
@@ -130,10 +130,8 @@ async def add_question(
     return RedirectResponse(url="/admin", status_code=303)
 
 @app.post("/admin/delete/{q_id}", response_class=HTMLResponse)
-async def delete_question(request: Request, q_id: int):
-    questions = load_questions()
-    questions = [q for q in questions if q["id"] != q_id]
-    save_questions(questions)
+async def delete_question_route(request: Request, q_id: int):
+    delete_question(q_id)
     return RedirectResponse(url="/admin", status_code=303)
 
 @app.post("/admin/import", response_class=HTMLResponse)
